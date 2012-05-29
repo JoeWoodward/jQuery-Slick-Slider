@@ -1,11 +1,31 @@
-$.fn.initSlickSlider = function(){
+// jQuery.slickSlider.js
+//
+// Developed by Joe Woodward, @jwwrd, free to use for any purpose you see fit.
+//
+//
+// To initialise call initSlickSlider on the menu li's
+// You can control the speed of the sliding animation with transitionDuration: time
+// You can stop the slides from fading as they leave the #slide-window by setting fade: false
+//
+// e.g. $('#menu li').initSlickSlider({fade: true, transitionDuration: 300});
+//
+// TODO modulate slide function and have a fade only slider
+
+$.fn.initSlickSlider = function(options){
+
+  // set default options
+  var settings = jQuery.extend({
+    transitionDuration: 300, fade: true
+  }, options);
+
   // $(this) should be a group of li's
   var menu = $(this);
 
+  // set the #slides-window's height to the first .slide's height
+  $(this).closest('div').find('#slides').animate({height: $(this).closest('div').find('#1').height()}, 800);
+
   // fade content-area away and new one in
   $(menu).live('click', function(event) {
-
-    var transitionSpeed = 800;
 
     // get the parent div incase there are multiple tabbed sliders on one page
     var parent = $(this).closest('div');
@@ -23,28 +43,31 @@ $.fn.initSlickSlider = function(){
     var slides = $(parent).find('#slides');
 
     //  get the current slide
-    var newSlide = $(slides).find('#' + newId);
+    var newSlide = $(slides).find('#' + (newId));
 
     $(slides).children().stop().css('opacity', 1);
 
-    if(true === true) {
+    var range;
+    var time;
+
+    if(settings.fade === true) {
       if(currentId > newId) {
-        var range = currentId - newId;
-        var time = transitionSpeed / range;
+        range = currentId - newId;
+        time = (settings.transitionDuration / range) * 0.8;
         for(var i = currentId; i > newId; i--) {
-          $('#' + i).delay(time * (range - (i - newId)) + 100).animate({opacity:0}, time * 0.33, 'linear');
+          $('#' + i).delay(time * (range - (i - newId))).animate({opacity:0}, time, 'linear');
         }
       } else {
-        var range = newId - currentId;
-        var time = transitionSpeed / range;
+        range = newId - currentId;
+        time = (settings.transitionDuration / range) * 0.8;
         for(var i = currentId; i < newId; i++) {
-          $('#' + i).delay(time * (range - (newId - i)) + 100).animate({opacity:0}, time * 0.33, 'linear');
+          $('#' + i).delay(time * (range - (newId - i))).animate({opacity:0}, time, 'linear');
         }
       }
     }
 
     // slide the #slides div to the correct posisiton and change the height
-    $(slides).stop().animate({height: $(newSlide).height(), marginLeft: -(newId * 160) + '%'}, transitionSpeed, 'linear', function(){
+    $(slides).stop().animate({height: $(newSlide).height(), marginLeft: -((newId - 1) * 120) + '%'}, settings.transitionDuration, 'linear', function(){
       $(slides).children().css('opacity', 1);
     });
 
@@ -58,4 +81,3 @@ $.fn.initSlickSlider = function(){
     $(this).addClass('active').siblings().removeClass('active');
   });
 };
-
